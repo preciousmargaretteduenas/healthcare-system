@@ -1,0 +1,1 @@
+Staff dashboard authentication has been added through login.html. Demo credentials: staff / pagasa123.
