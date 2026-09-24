@@ -14,6 +14,12 @@ $date = $_POST["date"] ?? "";
 $time = $_POST["time"] ?? "";
 $reason = trim($_POST["reason"] ?? "");
 
+$parsedTime = strtotime($time);
+if ($parsedTime === false) {
+    die("Invalid appointment time.");
+}
+$time = date("H:i:s", $parsedTime);
+
 if ($name === "" || $contact === "" || $service === "" || $date === "" || $time === "") {
     die("Please complete all required fields.");
 }
