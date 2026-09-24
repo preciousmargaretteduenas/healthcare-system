@@ -25,8 +25,9 @@ Use XAMPP for the working system:
 1. Install/start Apache and MySQL in XAMPP.
 2. Put this repository in:
    `C:\xampp\htdocs\healthcare-system`
-3. Import `database.sql` using phpMyAdmin.
-4. Open:
+3. If this is a new database, import `database.sql` using phpMyAdmin.
+4. If you already created the old database, import `database_update.sql` instead.
+5. Open:
    `http://localhost/healthcare-system/`
 
 ## Staff test login
