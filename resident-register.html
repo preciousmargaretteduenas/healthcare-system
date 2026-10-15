@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resident Registration | Pag-Asa Healthcare Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+.access-page{min-height:100vh;padding:32px 6%;background:linear-gradient(135deg,#eefaf6,#fff 65%)}
+.access-wrap{max-width:760px;margin:0 auto}.access-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px}
+.access-card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px;box-shadow:0 20px 55px rgba(16,53,46,.08)}
+.access-card h1{font-size:30px;color:var(--dark);letter-spacing:-1px;margin:8px 0}.access-card>p{font-size:12px;color:var(--muted)}
+.access-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}.access-form .wide{grid-column:1/-1}
+.access-form label{font-size:11px;font-weight:700;color:#45625b}.access-form input,.access-form select{display:block;width:100%;margin-top:6px;border:1px solid #d6e7e2;border-radius:9px;padding:12px;font:inherit;font-size:12px;background:#fbfefd}
+.notice{background:#f2faf7;border:1px solid #dcebe6;border-radius:12px;padding:14px;margin-top:20px;font-size:11px;color:#58766e}.notice strong{color:var(--dark)}
+.result{display:none;margin-top:18px;padding:16px;border-radius:12px;background:#e9f8f3;color:#08775d;font-size:12px}.result.show{display:block}
+@media(max-width:600px){.access-form{grid-template-columns:1fr}.access-form .wide{grid-column:auto}.access-top{gap:12px}.access-card{padding:22px}}
+</style>
+</head>
+<body><main class="access-page"><div class="access-wrap">
+<header class="access-top"><a href="index.html" class="brand"><div class="brand-icon">✚</div><div><strong>Pag-Asa</strong><span>Healthcare Center</span></div></a><a class="secondary" href="resident-login.html">Already registered? Log in</a></header>
+<section class="access-card">
+<span class="kicker">RESIDENT PORTAL</span><h1>Create a Resident Account</h1>
+<p>Register to request appointments and check their status. Registration will remain pending until healthcare staff verify that you live in Barangay Pag-Asa, Binangonan, Rizal.</p>
+<form class="access-form" id="residentRegister">
+<label>Full Name<input name="fullName" required autocomplete="name" placeholder="As shown on your ID"></label>
+<label>Birth Date<input name="birthDate" type="date" required></label>
+<label>Contact Number<input name="contact" type="tel" required placeholder="09XX XXX XXXX"></label>
+<label>Email Address<input name="email" type="email" required placeholder="you@example.com"></label>
+<label class="wide">Complete Address in Barangay Pag-Asa<input name="address" required placeholder="House/Street, Purok or Sitio, Barangay Pag-Asa"></label>
+<label>Proof of Residency<select name="proof" required><option value="">Select proof type</option><option>Barangay ID</option><option>Barangay Certificate of Residency</option><option>Other government-issued ID showing address</option><option>To be verified in person</option></select></label>
+<label>Proof Reference (optional)<input name="reference" placeholder="Reference number only; do not upload ID here"></label>
+<label>Password<input name="password" type="password" minlength="8" required autocomplete="new-password" placeholder="At least 8 characters"></label>
+<label>Confirm Password<input name="confirmPassword" type="password" minlength="8" required autocomplete="new-password" placeholder="Re-enter password"></label>
+<label class="wide" style="display:flex;gap:9px;align-items:flex-start;font-weight:500"><input style="width:auto;margin:2px 0 0" type="checkbox" required> I confirm that the information is accurate and understand that staff must verify my residency before my account is approved.</label>
+<div class="wide"><button class="primary full" type="submit">Submit Registration</button><div id="registrationResult" class="result" role="status"></div></div>
+</form>
+<div class="notice"><strong>Residency verification:</strong> This GitHub Pages prototype cannot verify identity or securely save registrations. Staff should check an original Barangay Pag-Asa ID, certificate of residency, or other accepted proof before approving an account. Do not enter real personal information in this demo.</div>
+</section></div></main>
+<script>
+document.getElementById('residentRegister').addEventListener('submit',function(e){
+ e.preventDefault();
+ const f=e.currentTarget;
+ if(f.password.value!==f.confirmPassword.value){alert('Passwords do not match. Please try again.');return;}
+ const out=document.getElementById('registrationResult');
+ out.textContent='Registration form validated for prototype. Status: PENDING VERIFICATION. No information has been saved or sent. In the working system, healthcare staff must verify your residency before account approval.';
+ out.classList.add('show');
+ f.reset();
+});
+</script></body></html>
