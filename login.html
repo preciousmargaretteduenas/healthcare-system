@@ -31,13 +31,26 @@ button.login{width:100%;border:0;background:var(--green);color:#fff;padding:13px
     <div id="error" class="error">Invalid username or password.</div>
     <button class="login" type="submit">Log In →</button>
   </form>
-  <div class="demo"><strong>Prototype login</strong><br>Username: <strong>staff</strong><br>Password: <strong>pagasa123</strong></div>
+  <div class="demo"><strong>Prototype account access</strong><br>Use a staff username and its password. Default demo password for the built-in service accounts: <strong>pagasa123</strong>.<br>Accounts and passwords are saved only in this browser for demonstration.</div>
   <a class="back" href="index.html">← Back to Healthcare Website</a>
 </main>
 <script>
-if(sessionStorage.getItem('staffLoggedIn')==='true') location.replace('dashboard.html');
-function togglePassword(){const p=document.getElementById('password'),b=document.querySelector('.toggle');p.type=p.type==='password'?'text':'password';b.textContent=p.type==='password'?'Show':'Hide'}
-document.getElementById('loginForm').addEventListener('submit',function(e){e.preventDefault();const u=document.getElementById('username').value.trim(),p=document.getElementById('password').value,error=document.getElementById('error');if(u==='staff'&&p==='pagasa123'){sessionStorage.setItem('staffLoggedIn','true');sessionStorage.setItem('staffName','Health Staff');location.replace('dashboard.html')}else{error.classList.add('show')}});
+(function(){
+const roles=['Midwife','Med Corner Staff','Immunization Staff','Family Planning Staff','Doctor / Checkup','TB Program Staff','Maternal / Postpartum Staff'];
+const usernameFor=role=>role.toLowerCase().replace(/[^a-z]+/g,'.').replace(/^\\.|\\.$/g,'');
+const seed=()=>({patients:[],appointments:[],queue:[],announcements:[],notifications:[],services:['Doctor / Checkup','Immunization','Family Planning','TB Program','Maternal / Postpartum Checkup','Med Corner','Child Health','Health Records'],settings:{center:'Pag-Asa Healthcare Center'},accounts:roles.map((role,i)=>({id:i+1,name:role,username:usernameFor(role),role,status:'Active',password:'pagasa123'}))});
+function getData(){let d;try{d=JSON.parse(localStorage.getItem('pagasaDashboardData')||'null')}catch(e){d=null}if(!d)d=seed();if(!Array.isArray(d.accounts))d.accounts=seed().accounts;d.accounts.forEach(a=>{if(!a.password)a.password='pagasa123';if(!a.status)a.status='Active'});localStorage.setItem('pagasaDashboardData',JSON.stringify(d));return d;}
+if(sessionStorage.getItem('staffLoggedIn')==='true')location.replace('dashboard.html');
+window.togglePassword=function(){const p=document.getElementById('password'),b=document.querySelector('.toggle');p.type=p.type==='password'?'text':'password';b.textContent=p.type==='password'?'Show':'Hide'};
+document.getElementById('loginForm').addEventListener('submit',function(e){
+e.preventDefault();const u=document.getElementById('username').value.trim().toLowerCase(),p=document.getElementById('password').value,error=document.getElementById('error');
+const d=getData();let account=null;
+if(u==='staff'&&p==='pagasa123')account={name:'Health Staff',role:'Administrator',username:'staff'};
+else account=d.accounts.find(a=>String(a.username).toLowerCase()===u&&a.password===p&&a.status==='Active');
+if(account){sessionStorage.setItem('staffLoggedIn','true');sessionStorage.setItem('staffName',account.name);sessionStorage.setItem('staffRole',account.role||'Staff');sessionStorage.setItem('staffUsername',account.username);location.replace('dashboard.html');}
+else{error.textContent='Invalid login, or this account is inactive. Check the username and password.';error.classList.add('show');}
+});
+})();
 </script>
 </body>
 </html>
