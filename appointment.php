@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 }
 
 $name = trim($_POST["name"] ?? "");
-$contact = trim($_POST["contact"] ?? "");
+$contact = trim($_POST["contact"] ?? "");\n$email = trim($_POST["email"] ?? "");
 $service = trim($_POST["service"] ?? "");
 $date = $_POST["date"] ?? "";
 $time = $_POST["time"] ?? "";
@@ -20,8 +20,8 @@ if ($parsedTime === false) {
 }
 $time = date("H:i:s", $parsedTime);
 
-if ($name === "" || $contact === "" || $service === "" || $date === "" || $time === "") {
-    die("Please complete all required fields.");
+if ($name === "" || $contact === "" || $email === "" || !filter_var($email, FILTER_VALIDATE_EMAIL) || $service === "" || $date === "" || $time === "") {
+    die("Please complete all required fields with a valid email address.");
 }
 
 if (!preg_match("/^\\d{4}-\\d{2}-\\d{2}$/", $date)) {
@@ -107,10 +107,10 @@ if (!$insertAppointment->execute()) {
             Please save it.
         </div>
 
-        <p><strong>Status:</strong> Pending</p>
+        <p><strong>Status:</strong> Pending</p>\n        <p><?= $emailSent ? "A tracking-code confirmation email was sent to " . htmlspecialchars($email) . "." : htmlspecialchars($emailError) ?></p>
 
         <a class="primary full" style="display:block;text-align:center;margin-top:16px;"
-           href="resident_status.php">
+           href="resident_status.php?code=<?= urlencode($tracking_code) ?>">
             Check Appointment Status
         </a>
 
