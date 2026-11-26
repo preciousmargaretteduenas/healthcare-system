@@ -86,6 +86,43 @@ $insertAppointment->bind_param(
 if (!$insertAppointment->execute()) {
     die("Unable to submit appointment: " . htmlspecialchars($conn->error));
 }
+
+$emailSent = false;
+$emailError = "Email delivery is not configured on this server yet.";
+$configPath = __DIR__ . "/smtp_config.php";
+$autoloadPath = __DIR__ . "/vendor/autoload.php";
+if (file_exists($configPath) && file_exists($autoloadPath)) {
+    require_once $autoloadPath;
+    $smtp = require $configPath;
+    try {
+        $mail = new PHPMailer\\PHPMailer\\PHPMailer(true);
+        $mail->isSMTP();
+        $mail->Host = $smtp["host"] ?? "smtp.gmail.com";
+        $mail->SMTPAuth = true;
+        $mail->Username = $smtp["username"];
+        $mail->Password = $smtp["app_password"];
+        $mail->SMTPSecure = PHPMailer\\PHPMailer\\PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = (int)($smtp["port"] ?? 587);
+        $mail->CharSet = "UTF-8";
+        $mail->setFrom($smtp["username"], $smtp["sender_name"] ?? "Pag-Asa Healthcare Center");
+        $mail->addAddress($email, $name);
+        $mail->isHTML(true);
+        $mail->Subject = "Your Pag-Asa Healthcare appointment tracking code";
+        $safeName = htmlspecialchars($name, ENT_QUOTES, "UTF-8");
+        $safeCode = htmlspecialchars($tracking_code, ENT_QUOTES, "UTF-8");
+        $safeService = htmlspecialchars($service, ENT_QUOTES, "UTF-8");
+        $safeDate = htmlspecialchars(date("F j, Y", strtotime($date)), ENT_QUOTES, "UTF-8");
+        $safeTime = htmlspecialchars(date("g:i A", strtotime($time)), ENT_QUOTES, "UTF-8");
+        $mail->Body = "<h2>Appointment request received</h2><p>Hello {$safeName},</p><p>Your appointment request was submitted to Pag-Asa Healthcare Center. It is currently <strong>Pending staff confirmation</strong>.</p><p><strong>Tracking code:</strong> {$safeCode}<br><strong>Service:</strong> {$safeService}<br><strong>Date:</strong> {$safeDate}<br><strong>Time:</strong> {$safeTime}</p><p>Keep this tracking code to check your appointment status. This email confirms submission only, not that the appointment schedule is confirmed.</p>";
+        $mail->AltBody = "Hello {$name}. Your request was submitted and is Pending staff confirmation. Tracking code: {$tracking_code}. Service: {$service}. Date: {$date}. Time: {$time}.";
+        $mail->send();
+        $emailSent = true;
+        $emailError = "";
+    } catch (Throwable $e) {
+        error_log("Appointment confirmation email error: " . $e->getMessage());
+        $emailError = "The request was saved, but email delivery failed. Please check your address or contact the health center.";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -107,7 +144,8 @@ if (!$insertAppointment->execute()) {
             Please save it.
         </div>
 
-        <p><strong>Status:</strong> Pending</p>\n        <p><?= $emailSent ? "A tracking-code confirmation email was sent to " . htmlspecialchars($email) . "." : htmlspecialchars($emailError) ?></p>
+        <p><strong>Status:</strong> Pending</p>
+        <p><?= $emailSent ? "A tracking-code confirmation email was sent to " . htmlspecialchars($email) . "." : htmlspecialchars($emailError) ?></p>
 
         <a class="primary full" style="display:block;text-align:center;margin-top:16px;"
            href="resident_status.php?code=<?= urlencode($tracking_code) ?>">
