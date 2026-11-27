@@ -87,6 +87,13 @@ if (!$insertAppointment->execute()) {
     die("Unable to submit appointment: " . htmlspecialchars($conn->error));
 }
 
+$appointmentId = (int)$conn->insert_id;
+$notify = $conn->prepare("INSERT INTO notifications (title, message, appointment_id, is_read) VALUES (?, ?, ?, 0)");
+$notifyTitle = "New appointment booking";
+$notifyMessage = $name . " booked " . $service . " for " . date("M j, Y", strtotime($date)) . " at " . date("g:i A", strtotime($time)) . " (Tracking: " . $tracking_code . ")";
+$notify->bind_param("ssi", $notifyTitle, $notifyMessage, $appointmentId);
+$notify->execute();
+
 $emailSent = false;
 $emailError = "Email delivery is not configured on this server yet.";
 $configPath = __DIR__ . "/smtp_config.php";
