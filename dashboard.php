@@ -65,6 +65,16 @@ $recentPatients = $conn->query(
      ORDER BY patient_id DESC
      LIMIT 5"
 );
+$recentNotifications = $conn->query(
+    "SELECT notification_id, title, message, created_at, is_read
+     FROM notifications
+     ORDER BY notification_id DESC
+     LIMIT 8"
+);
+$unreadNotifications = (int)$conn->query(
+    "SELECT COUNT(*) AS total FROM notifications WHERE is_read = 0"
+)->fetch_assoc()["total"];
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -118,6 +128,20 @@ $recentPatients = $conn->query(
         <a class="profile" href="logout.php">Logout</a>
     </div>
 </header>
+
+<section class="panel" style="margin-bottom:18px;">
+    <div class="panel-head">
+        <div><h2>Appointment Notifications <span class="pill yellow"><?= $unreadNotifications ?> new</span></h2><p>New resident bookings appear here after submission.</p></div>
+        <a class="outline" href="appointments.php">View Appointments</a>
+    </div>
+    <?php if ($recentNotifications && $recentNotifications->num_rows > 0): ?>
+        <div class="table-wrap"><table><thead><tr><th>Notification</th><th>Details</th><th>Received</th></tr></thead><tbody>
+        <?php while ($notification = $recentNotifications->fetch_assoc()): ?>
+        <tr><td><strong><?= htmlspecialchars($notification["title"]) ?></strong><?php if (!(int)$notification["is_read"]): ?><span class="pill yellow">New</span><?php endif; ?></td><td><?= htmlspecialchars($notification["message"]) ?></td><td><?= htmlspecialchars($notification["created_at"]) ?></td></tr>
+        <?php endwhile; ?>
+        </tbody></table></div>
+    <?php else: ?><p class="empty">No appointment notifications yet. New bookings will appear here.</p><?php endif; ?>
+</section>
 
 <section class="metric-grid">
 
