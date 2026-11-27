@@ -8,7 +8,8 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 }
 
 $name = trim($_POST["name"] ?? "");
-$contact = trim($_POST["contact"] ?? "");\n$email = trim($_POST["email"] ?? "");
+$contact = trim($_POST["contact"] ?? "");
+$email = trim($_POST["email"] ?? "");
 $service = trim($_POST["service"] ?? "");
 $date = $_POST["date"] ?? "";
 $time = $_POST["time"] ?? "";
